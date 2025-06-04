@@ -1,0 +1,14 @@
+{
+  "name": "socket-video-call-backend",
+  "version": "1.0.0",
+  "description": "Socket.io video call backend with Redis",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "redis": "^5.5.5",
+    "socket.io": "^4.8.1"
+  }
+}
