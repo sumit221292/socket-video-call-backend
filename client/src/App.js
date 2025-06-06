@@ -153,12 +153,13 @@ function App() {
             await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
           }
 
-          socket.emit('call_accepted', { 
-            callerId, 
+          socket.emit('call_accepted', {
+            callerId,
             targetUserId: userId,
             answer
           });
           setCurrentCall({ with: callerId });
+          updateStatus('busy');
         } catch (err) {
           toast.error('Error in call acceptance: ' + err.message);
         }
@@ -176,6 +177,7 @@ function App() {
           const candidate = iceCandidatesQueue.current.shift();
           await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
         }
+        updateStatus('busy');
       } catch (err) {
         toast.error('Error in call acceptance: ' + err.message);
       }
@@ -198,12 +200,14 @@ function App() {
       toast.warning(`${targetUserId} is busy on another call`);
       cleanupPeerConnection();
       setCurrentCall(null);
+      updateStatus('online');
     };
 
     const handleCallEnded = ({ reason }) => {
       toast.info(`Call ${reason}`);
       cleanupPeerConnection();
       setCurrentCall(null);
+      updateStatus('online');
     };
 
     // Add event listeners
@@ -288,8 +292,9 @@ function App() {
         targetUserId,
         offer
       });
-      
+
       setCurrentCall({ with: targetUserId });
+      updateStatus('busy');
     } catch (err) {
       toast.error('Error initiating call: ' + err.message);
       cleanupPeerConnection();
@@ -303,6 +308,7 @@ function App() {
       toast.error(`User ${targetUserId} is offline`);
       cleanupPeerConnection();
       setCurrentCall(null);
+      updateStatus('online');
     };
 
     socket.on('user_offline', handleUserOffline);
@@ -320,6 +326,7 @@ function App() {
       });
       cleanupPeerConnection();
       setCurrentCall(null);
+      updateStatus('online');
     }
   };
 

@@ -149,9 +149,11 @@ io.on('connection', (socket) => {
     if (callerSocketId) {
       activeUsers.set(callerId, targetUserId);
       activeUsers.set(targetUserId, callerId);
-      
+
       // Send call accepted only to the caller's socket
       io.to(callerSocketId).emit('call_accepted', { answer });
+      updateUserPresence(callerId, 'busy');
+      updateUserPresence(targetUserId, 'busy');
     }
   });
 
@@ -181,6 +183,8 @@ io.on('connection', (socket) => {
       if (otherSocketId) {
         io.to(otherSocketId).emit('call_ended', { reason: 'ended' });
       }
+      updateUserPresence(callerId, 'online');
+      updateUserPresence(otherUserId, 'online');
     }
   });
 
@@ -192,13 +196,14 @@ io.on('connection', (socket) => {
       if (activeUsers.has(userId)) {
         const otherUserId = activeUsers.get(userId);
         const otherSocketId = activeSessions.get(otherUserId);
-        
+
         activeUsers.delete(userId);
         activeUsers.delete(otherUserId);
-        
+
         if (otherSocketId) {
           io.to(otherSocketId).emit('call_ended', { reason: 'disconnected' });
         }
+        updateUserPresence(otherUserId, 'online');
       }
       await updateUserPresence(userId, 'offline');
     }
