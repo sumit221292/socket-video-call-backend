@@ -5,7 +5,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 //const socket = io('http://localhost:4000');
-const socket = io('https://zzeep.onrender.com');
+const socket = io('https://earn.f1stly.com/', {
+  path: '/socket.io',
+  transports: ['websocket'],
+  withCredentials: false
+});
+
 
 const configuration = {
   iceServers: [

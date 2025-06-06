@@ -5,12 +5,26 @@ const { createClient } = require('redis');
 
 const app = express();
 const server = http.createServer(app);
+
+app.get('/', (req, res) => {
+  res.send('Server is up and running!');
+});
+
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://guileless-fairy-364399.netlify.app"],
-    methods: ["GET", "POST"]
-  }
+    origin: [
+      'http://localhost:3000',
+      'https://guileless-fairy-364399.netlify.app',
+      'https://earn.f1stly.com'
+    ],
+    methods: ['GET', 'POST'],
+    credentials: false
+  },
+  transports: ['websocket'],
+  pingTimeout: 20000,
+  pingInterval: 25000
 });
+
 
 // Redis Configuration - Fixed for production
 let redisClient;
