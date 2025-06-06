@@ -240,6 +240,9 @@ function App() {
       toast.error('Please enter a user ID');
       return;
     }
+    if (socket.disconnected) {
+      socket.connect();
+    }
     setIsLoggedIn(true);
     toast.success(`Logged in as ${userId}`);
   };
@@ -250,6 +253,23 @@ function App() {
       userId,
       status: newStatus
     });
+  };
+
+  const handleLogout = () => {
+    socket.emit('update_status', { userId, status: 'offline' });
+    if (localStream.current) {
+      localStream.current.getTracks().forEach(track => track.stop());
+      localStream.current = null;
+    }
+    cleanupPeerConnection();
+    socket.off();
+    socket.disconnect();
+    setCurrentCall(null);
+    setUsers({});
+    setStatus('online');
+    setIsLoggedIn(false);
+    setTargetUserId('');
+    setUserId('');
   };
 
   const initiateCall = async () => {
@@ -336,6 +356,7 @@ function App() {
         <button onClick={() => updateStatus('online')}>Online</button>
         <button onClick={() => updateStatus('busy')}>Busy</button>
         <button onClick={() => updateStatus('offline')}>Offline</button>
+        <button onClick={handleLogout}>Logout</button>
       </div>
 
       <div className="call-controls">
